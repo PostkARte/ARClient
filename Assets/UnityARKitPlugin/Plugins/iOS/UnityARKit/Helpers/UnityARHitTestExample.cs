@@ -31,7 +31,7 @@ namespace UnityEngine.XR.iOS
 		// Update is called once per frame
 		void Update () 
 		{
-			if (Input.touchCount > 1 && m_HitTransform != null)
+			if (Input.touchCount > 2 && m_HitTransform != null)
 			{
 				var touch = Input.GetTouch(0);
 				if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved)

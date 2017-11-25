@@ -8,6 +8,7 @@ public class ObjectController : MonoBehaviour {
 	private float dist;
 	private Vector3 offset; 
 	private GameObject obj;
+	private float fingerDist;
 
 	// Use this for initialization
 	void Start () {
@@ -43,12 +44,48 @@ public class ObjectController : MonoBehaviour {
 			rb.AddForce ((touchedPos - obj.transform.position) * 5.0f);
 		}
 
-		if (obj && Input.touchCount == 1 && Input.GetTouch (0).phase == TouchPhase.Ended) {
+
+
+		/* Scalaing Gesture */
+		if (Input.touchCount == 2 && Input.GetTouch (0).phase == TouchPhase.Began) 
+		{
+			Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+			RaycastHit[] hits;
+			hits = Physics.RaycastAll (ray);
+			for (int i = 0; i < hits.Length; ++i) {
+				RaycastHit hit = hits [i];
+				if (hit.collider.gameObject.CompareTag ("Picture")) {
+					print ("User Tap Object: " + hit.collider.gameObject.name);
+					obj = hit.collider.gameObject;
+					break;
+				}
+			}
+
+			fingerDist = Vector3.Distance (Input.GetTouch (0).position, Input.GetTouch (1).position);
+		}
+
+		if (obj && Input.touchCount == 2 && Input.GetTouch (0).phase == TouchPhase.Moved) 
+		{
+			float scaleDist = Vector3.Distance (Input.GetTouch (0).position, Input.GetTouch (1).position);
+
+			if (scaleDist > fingerDist) {
+				float yy = (obj.transform.localScale.y + 0.05f);
+				if (yy <= 2)	
+					obj.transform.localScale += new Vector3 (0f, 0.05f, 0.05f); 
+			} 
+			else if (scaleDist < fingerDist) {
+				float yy = (obj.transform.localScale.y + 0.05f);
+				if (yy >= 0.95f)
+					obj.transform.localScale -= new Vector3 (0f, 0.05f, 0.05f);
+			}
+
+			fingerDist = scaleDist;
+		}
+
+		if (obj && Input.touchCount <= 2 && Input.GetTouch (0).phase == TouchPhase.Ended) {
 			//Rigidbody rb = obj.GetComponent<Rigidbody> ();
 			//rb.AddForce (Vector3.zero);
 			obj = null;
 		}
-
-
 	}
 }
