@@ -5,10 +5,11 @@ using UnityEngine.Video;
 
 public class GalleryController : MonoBehaviour {
 
-	public Transform camera;
+//	public Transform camera;
 	public Transform center;
 	// Use this for initialization
-	private Renderer renderer;
+//	private Renderer renderer;
+	private Rigidbody rb;
 
 	void Start() {
 		/*
@@ -26,15 +27,23 @@ public class GalleryController : MonoBehaviour {
 		player.playOnAwake = true;
 		player.isLooping = true;
 		player.source = VideoSource.Url;
-		gameObject.AddComponent<Rigidbody> ();
-		Rigidbody rb = gameObject.GetComponent<Rigidbody> ();
-		rb.useGravity = false;
-		rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+
 	}
 
 	// Update is called once per frame
 	void Update () {
-		//gameObject.transform.RotateAround (center.position, Vector3.up, 10* Time.deltaTime);
-		//gameObject.transform.LookAt(camera);
+		
+	}
+
+	public void explosion() {
+		float stride = 5000f;
+		float xx = Random.Range (-stride, stride);
+		float zz = Random.Range (-stride, stride);
+		gameObject.AddComponent<Rigidbody> ();
+		rb = gameObject.GetComponent<Rigidbody> ();
+		rb.useGravity = false;
+		rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+		rb.mass = 1000f;
+		rb.AddForce (new Vector3 (xx, stride, zz));
 	}
 }
