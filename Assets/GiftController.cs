@@ -8,6 +8,11 @@ public class GiftController : MonoBehaviour {
 	public GameObject expObj;
 	public GameObject phyObj;
 	public GameObject pictureObj;
+	public GameObject flameObj;
+
+
+	private GameObject clonedExploObj;
+
 	float beginTime;
 	bool isExplosed;
 
@@ -16,36 +21,39 @@ public class GiftController : MonoBehaviour {
 		beginTime = Time.time;
 		print (beginTime);
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		/*
-		if (!isExplosed && Time.time - beginTime >= 2) {
+		if (!isExplosed && Time.time - beginTime >= 5) {
 			isExplosed = true;
-			explosion (gameObject);
+			beginTime = Time.time;
+			explosion ();
 		}
 		*/
+
 	}
 
-	public void explosion(GameObject parent) {
-		GameObject exploObjCloned = Object.Instantiate (expObj, gameObject.transform.position, gameObject.transform.rotation);
-		//GameObject phyObjCloned = Object.Instantiate (phyObj, gameObject.transform.position, gameObject.transform.rotation);
+	void FixedUpdate() {
+		
+	}
 
-		for (int i = 0; i < 5; ++i) {
-			GameObject clonedPic = Instantiate (pictureObj, gameObject.transform.position + new Vector3(0, 0, 0), gameObject.transform.rotation);
-			clonedPic.transform.localScale = pictureObj.transform.localScale * 0.1f;
-			clonedPic.tag = "Picture";
-			clonedPic.transform.parent = parent.transform;
-		}
+	public void explosion() {
+		GameObject clonedExploObj = Object.Instantiate (expObj, gameObject.transform.position, gameObject.transform.rotation);
+		//GameObject clonedFlame = Object.Instantiate (flameObj, gameObject.transform.position, gameObject.transform.rotation);
 
+		clonedExploObj.transform.parent = gameObject.transform.parent;
+		//clonedFlame.transform.parent = gameObject.transform.parent;
 
 		GameObject[] objs = GameObject.FindGameObjectsWithTag ("Picture");
 		for (int i = 0; i < objs.Length; ++i) {
 			GameObject obj = objs [i];
 			GalleryController script = obj.GetComponent<GalleryController> ();
-			script.explosion ();
+			script.explosion (gameObject.transform.position);
+			print ("Explosion: " + i.ToString());
 		}
 
 		print ("Explosion!!");
+		gameObject.SetActive (false);
 	}
 }
