@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ObjectController : MonoBehaviour {
 
 	public GameObject pictureObj;
 	public GameObject parObj;
+	public GameObject giftObj;
 
 	private Transform toDrag;
 	private float dist;
@@ -16,8 +18,7 @@ public class ObjectController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		string url = "http://35.196.236.27:3000/postcard/code/V4GW63";
-		StartCoroutine (getJSON(url));
+		
 	}
 	
 	// Update is called once per frame
@@ -125,6 +126,21 @@ public class ObjectController : MonoBehaviour {
 
 			print (code.assets[i].type + " " + code.assets [i].url);
 		}
+	}
+
+	public void createGift(UnityEngine.UI.Text inputCode) {
+		/* http://35.196.236.27:3000/postcard/code/V4GW63 */
+		string code = inputCode.text;
+		string url = "http://35.196.236.27:3000/postcard/code/" + code;
+		print (url);
+
+		GameObject[] pictures = GameObject.FindGameObjectsWithTag ("Picture");
+		for (int i = 0; i < pictures.Length; ++i) {
+			Destroy (pictures [i]);
+		}
+
+		StartCoroutine (getJSON(url));
+		giftObj.SetActive (true);
 	}
 
 }
