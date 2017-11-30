@@ -108,10 +108,10 @@ namespace UnityEngine.XR.iOS
 
 			m_ClearMaterial.SetTexture("_textureY", _videoTextureY);
 			m_ClearMaterial.SetTexture("_textureCbCr", _videoTextureCbCr);
-
 			m_ClearMaterial.SetMatrix("_DisplayTransform", _displayTransform);
 		}
  
 #endif
+
     }
 }

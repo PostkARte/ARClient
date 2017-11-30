@@ -18,7 +18,7 @@ public class ObjectController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+		giftObj.SetActive (false);
 	}
 	
 	// Update is called once per frame
@@ -128,6 +128,31 @@ public class ObjectController : MonoBehaviour {
 		}
 	}
 
+	public void detectGift(string jsonString) {
+		CodeInfo code = CodeInfo.CreateFromJSON (jsonString);
+		print (code.code);
+		if (code.code.Length < 5)
+			return;
+
+		GameObject[] pictures = GameObject.FindGameObjectsWithTag ("Picture");
+		for (int i = 0; i < pictures.Length; ++i) 
+			Destroy (pictures [i]);
+
+		for (int i = 0; i < code.assets.Length; ++i) {
+			GameObject clonedPic = Instantiate (pictureObj, new Vector3(1000, 1000, 1000), Quaternion.identity);
+			clonedPic.transform.localScale = pictureObj.transform.localScale * 0.1f;
+			clonedPic.tag = "Picture";
+			clonedPic.transform.parent = parObj.transform;
+
+			GalleryController galleryScript = clonedPic.GetComponent<GalleryController> ();
+			galleryScript.createObject (code.assets[i].type, code.assets[i].url);
+
+			print (code.assets[i].type + " " + code.assets [i].url);
+		}
+
+		giftObj.SetActive (true);
+	}
+
 	public void createGift(UnityEngine.UI.Text inputCode) {
 		/* http://35.196.236.27:3000/postcard/code/V4GW63 */
 		string code = inputCode.text;
@@ -165,6 +190,7 @@ public class CodeInfo
 	public string created_at;
 	public string uuid;
 	public string updated_at;
+	public string postcard;
 	public AssetInfo[] assets; 
 	public int latitude;
 	public int longitude;
