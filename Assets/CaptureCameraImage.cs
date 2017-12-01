@@ -1,18 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Networking;
 
 public class CaptureCameraImage : MonoBehaviour {
 	public GameObject cubeObj;
 	public GameObject mainCam;
+	public Text status;
 
+	private float statusBeginTime;
+	private bool isShowStatus;
 	private RenderTexture rt;
 	private ObjectController oc;
 
 	// Use this for initialization
 	void Start () {
-		//beginTime = Time.time;
+		isShowStatus = false;
 		rt = gameObject.GetComponent<Camera> ().targetTexture;
 		oc = mainCam.GetComponent<ObjectController> ();
 	}
@@ -44,15 +48,22 @@ public class CaptureCameraImage : MonoBehaviour {
 
 		if (www.error == null) {
 			print ("Messaege: " + www.text);
-			oc.detectGift (www.text);
-		}
-		else
+			oc.detectGift (www.text, status);
+		} else {
+			status.text = "Match Postcard Fail ... ";
 			print ("Error: " + www.error.ToString ());
+		}
+
+		isShowStatus = true;
+		statusBeginTime = Time.time;
 	}
 
 
 	// Update is called once per frame
-	void Update () {
-		
+	void FixedUpdate () {
+		if (isShowStatus && Time.time - statusBeginTime >= 3) {
+			status.text = "";
+			isShowStatus = false;
+		}
 	}
 }

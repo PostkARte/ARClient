@@ -128,11 +128,13 @@ public class ObjectController : MonoBehaviour {
 		}
 	}
 
-	public void detectGift(string jsonString) {
+	public void detectGift(string jsonString, Text status) {
 		CodeInfo code = CodeInfo.CreateFromJSON (jsonString);
 		print (code.code);
-		if (code.code.Length < 5)
+		if (code.code.Length < 5) {
+			status.text = "Match Postcard Fail ... ";
 			return;
+		}
 
 		GameObject[] pictures = GameObject.FindGameObjectsWithTag ("Picture");
 		for (int i = 0; i < pictures.Length; ++i) 
@@ -150,6 +152,11 @@ public class ObjectController : MonoBehaviour {
 			print (code.assets[i].type + " " + code.assets [i].url);
 		}
 
+		if (code.assets.Length == 0)
+			status.text = "There is no pictures in postcard ..";
+		else
+			status.text = "Match postcard successfully !";
+		
 		giftObj.SetActive (true);
 	}
 
