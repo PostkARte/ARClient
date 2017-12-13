@@ -573,6 +573,7 @@ MonoBehaviour:
   pictureObj: {fileID: 1594972775326244, guid: bd7964d2ba9394b1ba38b7ff964dc8bf, type: 2}
   parObj: {fileID: 1757068774}
   giftObj: {fileID: 1241112884}
+  plane: {fileID: 0}
 --- !u!1 &294771741
 GameObject:
   m_ObjectHideFlags: 0
@@ -1950,6 +1951,7 @@ GameObject:
   - component: {fileID: 1215883952}
   - component: {fileID: 1215883951}
   - component: {fileID: 1215883950}
+  - component: {fileID: 1215883953}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -2029,6 +2031,17 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1215883948}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1215883953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1215883948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f1ac27baf482214fad3b52aaa0eacfd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1241112884
 GameObject:
   m_ObjectHideFlags: 0
@@ -2765,7 +2778,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2004565148}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 960, y: 540, z: 0}
+  m_LocalPosition: {x: 237.5, y: 254.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1069765709}
