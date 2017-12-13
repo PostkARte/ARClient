@@ -128,17 +128,18 @@ public class ObjectController : MonoBehaviour {
 			print (code.assets[i].type + " " + code.assets [i].url);
 		}
 
-        plane.GetComponent<StaticMapService>().LoadMap(code.latitude, code.longitude);
+        
 	}
 
 	public void detectGift(string jsonString, Text status) {
 		CodeInfo code = CodeInfo.CreateFromJSON (jsonString);
-		print (code.code);
+
 		if (code.code.Length < 5) {
 			status.text = "Match Postcard Fail ... ";
 			return;
 		}
-
+			
+		plane.GetComponent<StaticMapService>().LoadMap(code.latitude, code.longitude);
 		GameObject[] pictures = GameObject.FindGameObjectsWithTag ("Picture");
 		for (int i = 0; i < pictures.Length; ++i) 
 			Destroy (pictures [i]);
@@ -195,15 +196,15 @@ public class AssetInfo
 [System.Serializable]
 public class CodeInfo
 {
-	public int id { get; set; }
-	public string code { get; set; }
-    public string created_at { get; set; }
-    public string uuid { get; set; }
-    public string updated_at { get; set; }
-    public string postcard { get; set; }
-    public AssetInfo[] assets { get; set; }
-    public float latitude { get; set; }
-    public float longitude { get; set; }
+	public int id;
+	public string code;
+	public string created_at;
+	public string uuid;
+	public string updated_at;
+	public string postcard;
+	public AssetInfo[] assets;
+	public float latitude;
+	public float longitude;
 
     public static CodeInfo CreateFromJSON(string jsonString)
 	{
