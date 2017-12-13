@@ -112,6 +112,8 @@ public class ObjectController : MonoBehaviour {
 					break;
 			}
 		}
+			
+		BrakeObject (messageObj);
 	}
 
 	IEnumerator getJSON(string url) {
@@ -185,14 +187,28 @@ public class ObjectController : MonoBehaviour {
 	}
 
 	public void toggleMessage() {
-		messageObj.SetActive (!messageObj.activeSelf);
+		ToggleObject (messageObj);
 	}
 
 	private void setMessage(string text) {
-		Vector3 pos = Camera.main.transform.position;
-		print (pos);
 		TextMeshPro textmeshPro = messageObj.GetComponent<TextMeshPro> ();
 		textmeshPro.SetText (text);
+		messageObj.transform.position = new Vector3 (0, 0, 0);
+	}
+
+	private void ToggleObject(GameObject obj) {
+		obj.SetActive (!obj.activeSelf);
+		if (obj.activeSelf) {
+			obj.GetComponent<Rigidbody> ().AddForce (new Vector3 (0, 0, 50f));
+		} else {
+			obj.transform.position = new Vector3 (0, 0, 0);
+		}
+	}
+
+	private void BrakeObject(GameObject obj) {
+		if (obj.transform.position.z >= 1) {
+			obj.GetComponent<Rigidbody> ().velocity = new Vector3 (0, 0, 0);
+		}
 	}
 
 }
