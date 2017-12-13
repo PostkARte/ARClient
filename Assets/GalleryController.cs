@@ -41,20 +41,11 @@ public class GalleryController : MonoBehaviour {
 
 	public void createObject(string type, string url) {
 		if (type == "video") {
-			gameObject.AddComponent<VideoPlayer> ();
-			VideoPlayer player = gameObject.GetComponent<VideoPlayer> ();
-			player.url = url;
-			player.playOnAwake = true;
-			player.isLooping = true;
-			player.source = VideoSource.Url;
-			player.Stop ();
+			StartCoroutine (createVideo (url));
 		} else if (type == "image") {
 			StartCoroutine (createImage (url));
 		} else if (type == "audio") {
 			StartCoroutine (createAudio (url));
-			Destroy (gameObject.GetComponent<Rigidbody> ());
-			Destroy (gameObject.GetComponent<BoxCollider> ());
-			Destroy (gameObject.GetComponent<Renderer> ());
 		}
 	}
 
@@ -69,6 +60,17 @@ public class GalleryController : MonoBehaviour {
 		renderer.material.mainTexture = www.texture;
 	}
 
+	IEnumerator createVideo(string url) {
+		gameObject.AddComponent<VideoPlayer> ();
+		VideoPlayer player = gameObject.GetComponent<VideoPlayer> ();
+		player.url = url;
+		player.playOnAwake = true;
+		player.isLooping = true;
+		player.source = VideoSource.Url;
+		player.Stop ();
+		yield return null;
+	}
+
 	IEnumerator createAudio(string url) {
 		WWW www = new WWW (url);
 
@@ -78,5 +80,9 @@ public class GalleryController : MonoBehaviour {
 		source.clip = www.GetAudioClip ();
 		source.loop = true;
 		source.Stop ();
+
+		Destroy (gameObject.GetComponent<Rigidbody> ());
+		Destroy (gameObject.GetComponent<BoxCollider> ());
+		Destroy (gameObject.GetComponent<Renderer> ());
 	}
 }

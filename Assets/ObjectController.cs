@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ObjectController : MonoBehaviour {
 
@@ -9,6 +10,7 @@ public class ObjectController : MonoBehaviour {
 	public GameObject parObj;
 	public GameObject giftObj;
     public GameObject plane;
+	public GameObject messageObj;
 
 	private Transform toDrag;
 	private float dist;
@@ -20,6 +22,7 @@ public class ObjectController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		giftObj.SetActive (false);
+		messageObj.SetActive (false);
 	}
 	
 	// Update is called once per frame
@@ -162,6 +165,8 @@ public class ObjectController : MonoBehaviour {
 			status.text = "Match postcard successfully !";
 		
 		giftObj.SetActive (true);
+
+		setMessage (code.text);
 	}
 
 	public void createGift(UnityEngine.UI.Text inputCode) {
@@ -177,6 +182,17 @@ public class ObjectController : MonoBehaviour {
 
 		StartCoroutine (getJSON(url));
 		giftObj.SetActive (true);
+	}
+
+	public void toggleMessage() {
+		messageObj.SetActive (!messageObj.activeSelf);
+	}
+
+	private void setMessage(string text) {
+		Vector3 pos = Camera.main.transform.position;
+		print (pos);
+		TextMeshPro textmeshPro = messageObj.GetComponent<TextMeshPro> ();
+		textmeshPro.SetText (text);
 	}
 
 }
@@ -205,6 +221,7 @@ public class CodeInfo
 	public AssetInfo[] assets;
 	public float latitude;
 	public float longitude;
+    public string text;
 
     public static CodeInfo CreateFromJSON(string jsonString)
 	{
