@@ -8,6 +8,7 @@ public class ObjectController : MonoBehaviour {
 	public GameObject pictureObj;
 	public GameObject parObj;
 	public GameObject giftObj;
+    public GameObject plane;
 
 	private Transform toDrag;
 	private float dist;
@@ -126,6 +127,8 @@ public class ObjectController : MonoBehaviour {
 
 			print (code.assets[i].type + " " + code.assets [i].url);
 		}
+
+        plane.GetComponent<StaticMapService>().LoadMap(code.latitude, code.longitude);
 	}
 
 	public void detectGift(string jsonString, Text status) {
@@ -192,17 +195,17 @@ public class AssetInfo
 [System.Serializable]
 public class CodeInfo
 {
-	public int id;
-	public string code;
-	public string created_at;
-	public string uuid;
-	public string updated_at;
-	public string postcard;
-	public AssetInfo[] assets; 
-	public int latitude;
-	public int longitude;
+	public int id { get; set; }
+	public string code { get; set; }
+    public string created_at { get; set; }
+    public string uuid { get; set; }
+    public string updated_at { get; set; }
+    public string postcard { get; set; }
+    public AssetInfo[] assets { get; set; }
+    public float latitude { get; set; }
+    public float longitude { get; set; }
 
-	public static CodeInfo CreateFromJSON(string jsonString)
+    public static CodeInfo CreateFromJSON(string jsonString)
 	{
 		return JsonUtility.FromJson<CodeInfo>(jsonString);
 	}
