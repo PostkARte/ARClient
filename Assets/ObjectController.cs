@@ -108,7 +108,15 @@ public class ObjectController : MonoBehaviour {
 					break;
 				}
 
-				if (hit.collider.gameObject.CompareTag("Picture"))
+                // Start OnHit() method from the MarkerController
+                if (hit.collider.gameObject.CompareTag("marker"))
+                {
+                    MarkerController marker = hit.collider.gameObject.GetComponent<MarkerController>();
+                    marker.OnHit();
+                    break;
+                }
+
+                if (hit.collider.gameObject.CompareTag("Picture"))
 					break;
 			}
 		}
@@ -147,6 +155,8 @@ public class ObjectController : MonoBehaviour {
 		for (int i = 0; i < pictures.Length; ++i) 
 			Destroy (pictures [i]);
 
+        List<GalleryController> pictureObjects = new List<GalleryController>();
+
 		for (int i = 0; i < code.assets.Length; ++i) {
 			GameObject clonedPic = Instantiate (pictureObj, new Vector3(1000, 1000, 1000), Quaternion.identity);
 			clonedPic.transform.localScale = pictureObj.transform.localScale * 0.1f;
@@ -156,8 +166,13 @@ public class ObjectController : MonoBehaviour {
 			GalleryController galleryScript = clonedPic.GetComponent<GalleryController> ();
 			galleryScript.createObject (code.assets[i].type, code.assets[i].url);
 
+            if (code.assets[i].type.Equals("image"))
+                pictureObjects.Add(galleryScript);
+
 			print (code.assets[i].type + " " + code.assets [i].url);
 		}
+
+        plane.GetComponent<SpawnRandomPins>().InitMarkers(pictureObjects);
 
 		if (code.assets.Length == 0)
 			status.text = "There is no pictures in postcard ..";

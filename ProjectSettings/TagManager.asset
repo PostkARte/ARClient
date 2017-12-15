@@ -8,6 +8,7 @@ TagManager:
   - gift
   - CanDestroy
   - Message
+  - marker
   layers:
   - Default
   - TransparentFX

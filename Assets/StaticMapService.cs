@@ -7,9 +7,9 @@ public class StaticMapService : MonoBehaviour {
     private float lat;
     private float lon;
 
-    private int zoom = 14;
+    private int zoom = 13;
 
-    private string mapSelected = "hybrid";
+    private string mapSelected = "roadmap";
     private int scale = 2;
 
     // Use this for initialization
