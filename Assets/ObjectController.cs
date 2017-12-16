@@ -11,6 +11,8 @@ public class ObjectController : MonoBehaviour {
 	public GameObject giftObj;
     public GameObject plane;
 	public GameObject messageObj;
+	public GameObject videoObj;
+	public Text inputCode;
 
 	private Transform toDrag;
 	private float dist;
@@ -114,6 +116,7 @@ public class ObjectController : MonoBehaviour {
 		}
 			
 		BrakeObject (messageObj);
+		BrakeObject (videoObj);
 	}
 
 	IEnumerator getJSON(string url) {
@@ -150,13 +153,19 @@ public class ObjectController : MonoBehaviour {
 			Destroy (pictures [i]);
 
 		for (int i = 0; i < code.assets.Length; ++i) {
+			string type = code.assets [i].type;
 			GameObject clonedPic = Instantiate (pictureObj, new Vector3(1000, 1000, 1000), Quaternion.identity);
 			clonedPic.transform.localScale = pictureObj.transform.localScale * 0.1f;
 			clonedPic.tag = "Picture";
 			clonedPic.transform.parent = parObj.transform;
 
 			GalleryController galleryScript = clonedPic.GetComponent<GalleryController> ();
-			galleryScript.createObject (code.assets[i].type, code.assets[i].url);
+			galleryScript.createObject (type, code.assets[i].url);
+
+			if (type == "video") {
+				videoObj = clonedPic;
+				ToggleObject (clonedPic);
+			}
 
 			print (code.assets[i].type + " " + code.assets [i].url);
 		}
@@ -171,7 +180,7 @@ public class ObjectController : MonoBehaviour {
 		setMessage (code.text);
 	}
 
-	public void createGift(UnityEngine.UI.Text inputCode) {
+	public void createGift() {
 		/* http://35.196.236.27:3000/postcard/code/V4GW63 */
 		string code = inputCode.text;
 		string url = "http://35.196.236.27:3000/postcard/code/" + code;
@@ -190,6 +199,10 @@ public class ObjectController : MonoBehaviour {
 		ToggleObject (messageObj);
 	}
 
+	public void toggleVideo() {
+		ToggleObject (videoObj);
+	}
+
 	private void setMessage(string text) {
 		TextMeshPro textmeshPro = messageObj.GetComponent<TextMeshPro> ();
 		textmeshPro.SetText (text);
@@ -197,16 +210,18 @@ public class ObjectController : MonoBehaviour {
 	}
 
 	private void ToggleObject(GameObject obj) {
-		obj.SetActive (!obj.activeSelf);
-		if (obj.activeSelf) {
-			obj.GetComponent<Rigidbody> ().AddForce (new Vector3 (0, 0, 50f));
-		} else {
-			obj.transform.position = new Vector3 (0, 0, 0);
+		if (obj != null) {
+			obj.SetActive (!obj.activeSelf);
+			if (obj.activeSelf) {
+				obj.GetComponent<Rigidbody> ().AddForce (new Vector3 (0, 0, 50f));
+			} else {
+				obj.transform.position = new Vector3 (0, 0, 0);
+			}
 		}
 	}
 
 	private void BrakeObject(GameObject obj) {
-		if (obj.transform.position.z >= 1) {
+		if (obj != null && obj.transform.position.z >= 1) {
 			obj.GetComponent<Rigidbody> ().velocity = new Vector3 (0, 0, 0);
 		}
 	}
