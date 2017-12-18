@@ -7,19 +7,22 @@ public class GiftController : MonoBehaviour {
 	// Use this for initialization
 	public GameObject expObj;
 	public GameObject phyObj;
-	public GameObject pictureObj;
 	public GameObject flameObj;
 
-
+	private GameObject pictureObj;
 	private GameObject clonedExploObj;
 
-	float beginTime;
-	bool isExplosed;
+	//float beginTime;
+	private bool isExplosed;
+	private bool isRotated;
 
 	void Start () {
 		isExplosed = false;
-		beginTime = Time.time;
-		print (beginTime);
+		isRotated = false;
+		//beginTime = Time.time;
+		Vector3 cameraPos = Camera.main.gameObject.transform.position;
+		Vector3 giftPos = gameObject.transform.position;
+		gameObject.transform.LookAt (new Vector3(cameraPos.x, giftPos.y, cameraPos.z));
 	}
 
 	// Update is called once per frame
@@ -31,11 +34,25 @@ public class GiftController : MonoBehaviour {
 			explosion ();
 		}
 		*/
-
+		if (isRotated) {
+			gameObject.transform.Rotate (new Vector3 (0, 4, 0));
+		}
 	}
 
 	void FixedUpdate() {
 		
+	}
+
+	public void StartRotate() {
+		isRotated = true;
+	}
+
+	public void StopRotate() {
+		isRotated = false;
+	}
+
+	public void setPictureObj(GameObject picture) {
+		pictureObj = picture;
 	}
 
 	public void explosion() {
@@ -43,17 +60,13 @@ public class GiftController : MonoBehaviour {
 		//GameObject clonedFlame = Object.Instantiate (flameObj, gameObject.transform.position, gameObject.transform.rotation);
 
 		clonedExploObj.transform.parent = gameObject.transform.parent;
-		//clonedFlame.transform.parent = gameObject.transform.parent;
 
-		GameObject[] objs = GameObject.FindGameObjectsWithTag ("Picture");
-		for (int i = 0; i < objs.Length; ++i) {
-			GameObject obj = objs [i];
-			GalleryController script = obj.GetComponent<GalleryController> ();
-			script.explosion (gameObject.transform.position);
-			print ("Explosion: " + i.ToString());
-		}
+		GalleryController script = pictureObj.GetComponent<GalleryController> ();
+		script.explosion (gameObject.transform);
 
 		print ("Explosion!!");
-		gameObject.SetActive (false);
+		// isExplosed = true;
+		// isRotated = true;
+		// gameObject.SetActive (false);
 	}
 }

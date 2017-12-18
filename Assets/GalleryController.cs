@@ -6,37 +6,74 @@ using UnityEngine.Video;
 public class GalleryController : MonoBehaviour {
 
 	public Transform center;
+
+	private Vector3 goal;
+	private Vector3 targetScale;
 	private Rigidbody rb;
+	private GameObject childObj;
+	private GameObject giftObj;
 
 	void Start() {
-		
+		childObj = gameObject.transform.GetChild (0).GetChild(0).gameObject;
+		goal = Vector3.zero;
+		targetScale = gameObject.transform.localScale;
+		center = gameObject.transform;
 	}
 
 	// Update is called once per frame
 	void Update () {
-		
+		/* Scaling the picture */
+		gameObject.transform.position = Vector3.Lerp (gameObject.transform.position, center.position + goal, Time.deltaTime * 2f);
+		gameObject.transform.localScale = Vector3.Lerp (gameObject.transform.localScale, targetScale, Time.deltaTime * 2f);
+
+		/* Always look at the camera */
+		gameObject.transform.LookAt (
+			new Vector3(
+				Camera.main.transform.position.x, 
+				gameObject.transform.position.y, 
+				Camera.main.transform.position.z
+			)
+		);
 	}
 
-	public void explosion(Vector3 pos) {
-		float stride = 10000f;
-		float xx = Random.Range (-stride, stride);
-		float yy = Random.Range (0, stride);
-		float zz = Random.Range (-stride, stride);
-		gameObject.transform.position = pos;
+	public void SetGift(GameObject otherGiftObj) {
+		giftObj = otherGiftObj;
+	}
+
+	public void StartRotate() {
+		GiftController gc = giftObj.GetComponent<GiftController> ();
+		gc.StartRotate ();
+	}
+
+	public void StopRotate() {
+		GiftController gc = giftObj.GetComponent<GiftController> ();
+		gc.StopRotate ();
+	}
+
+	public void explosion(Transform posTransform) {
+		center = posTransform;
+		//gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, pos, Time.deltaTime);
+		gameObject.transform.position = center.position;
+		gameObject.transform.localScale = Vector3.zero;
+
+		goal = new Vector3(0, 0.1f, 0);
+		targetScale = Vector3.one;
+			
 		gameObject.AddComponent<Rigidbody> ();
 		rb = gameObject.GetComponent<Rigidbody> ();
 		rb.useGravity = false;
-		rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+		rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationY;
 		rb.mass = 1000f;
-		rb.AddForce (new Vector3 (xx, yy, zz));
+		//rb.AddForce (new Vector3 (xx, yy, zz));
 
-		VideoPlayer vp = gameObject.GetComponent<VideoPlayer> ();
-		AudioSource source = gameObject.GetComponent<AudioSource> ();
+		VideoPlayer vp = childObj.GetComponent<VideoPlayer> ();
+		AudioSource source = childObj.GetComponent<AudioSource> ();
 		if (vp != null)
 			vp.Play ();
 
 		if (source != null)
 			source.Play ();
+
 	}
 
 	public void createObject(string type, string url) {
@@ -56,13 +93,14 @@ public class GalleryController : MonoBehaviour {
 		yield return www;
 
 		// assign texture
-		Renderer renderer = GetComponent<Renderer>();
+		Renderer renderer = childObj.GetComponent<Renderer>();
 		renderer.material.mainTexture = www.texture;
 	}
 
 	IEnumerator createVideo(string url) {
-		gameObject.AddComponent<VideoPlayer> ();
-		VideoPlayer player = gameObject.GetComponent<VideoPlayer> ();
+		
+		childObj.AddComponent<VideoPlayer> ();
+		VideoPlayer player = childObj.GetComponent<VideoPlayer> ();
 		player.url = url;
 		player.playOnAwake = true;
 		player.isLooping = true;
@@ -76,13 +114,13 @@ public class GalleryController : MonoBehaviour {
 
 		yield return www;
 
-		AudioSource source = gameObject.AddComponent<AudioSource> ();
+		AudioSource source = childObj.AddComponent<AudioSource> ();
 		source.clip = www.GetAudioClip ();
 		source.loop = true;
 		source.Stop ();
 
-		Destroy (gameObject.GetComponent<Rigidbody> ());
-		Destroy (gameObject.GetComponent<BoxCollider> ());
-		Destroy (gameObject.GetComponent<Renderer> ());
+		Destroy (childObj.GetComponent<Rigidbody> ());
+		Destroy (childObj.GetComponent<BoxCollider> ());
+		Destroy (childObj.GetComponent<Renderer> ());
 	}
 }

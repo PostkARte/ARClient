@@ -11,6 +11,9 @@ public class ObjectController : MonoBehaviour {
 	public GameObject giftObj;
     public GameObject plane;
 	public GameObject messageObj;
+	public GameObject floorObj;
+	public Text inputCode;
+	public Text status;
 
 	private Transform toDrag;
 	private float dist;
@@ -18,11 +21,14 @@ public class ObjectController : MonoBehaviour {
 	private GameObject obj;
 	private float fingerDist;
 	private string data;
+	private Transform floorPos;
+	private Vector2 lastTouchedPos; 
 
 	// Use this for initialization
 	void Start () {
 		giftObj.SetActive (false);
 		messageObj.SetActive (false);
+		floorPos = floorObj.GetComponent<Transform> ();
 	}
 	
 	// Update is called once per frame
@@ -33,12 +39,24 @@ public class ObjectController : MonoBehaviour {
 			Ray ray = Camera.main.ScreenPointToRay( Input.GetTouch(0).position );
 			RaycastHit[] hits;
 			hits = Physics.RaycastAll (ray);
-
+			lastTouchedPos = new Vector2 (Input.GetTouch (0).position.x, Input.GetTouch (0).position.y);
+				
 			for (int i = 0; i < hits.Length; ++i) {
 				RaycastHit hit = hits [i];
+				if (hit.collider.gameObject.CompareTag ("gift")) {
+					StopAllGiftRotate();
+					GiftController exploScript = hit.collider.gameObject.GetComponent<GiftController> ();
+					exploScript.explosion ();
+					exploScript.StartRotate();
+					break;
+				}
+
 				if (hit.collider.gameObject.CompareTag ("Picture")) {
+					StopAllGiftRotate();
 					print ("User Tap Object: " + hit.collider.gameObject.name);
 					obj = hit.collider.gameObject;
+					GalleryController objScript = obj.GetComponent<GalleryController>();
+					objScript.StartRotate();
 					break;
 				}
 			}
@@ -47,12 +65,23 @@ public class ObjectController : MonoBehaviour {
 		if (obj && Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) {
 			Touch touch = Input.GetTouch(0); // get first touch since touch count is greater than zero
 			// get the touch position from the screen touch to world point
-			Vector3 touchedPos = Camera.main.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, 0.4f));
-			Rigidbody rb = obj.GetComponent<Rigidbody> ();
-			rb.AddForce ((touchedPos - obj.transform.position) * 5.0f * rb.mass);
+
+			float xx = 0.005f, yy = 0.005f;
+			if (touch.position.x - lastTouchedPos.x > 0)
+				xx = xx * -1f;
+			else if (touch.position.x - lastTouchedPos.x == 0)
+				xx = 0;
+
+			if (touch.position.y - lastTouchedPos.y < 0)
+				yy = yy * -1f;
+			else if (touch.position.y - lastTouchedPos.y == 0)
+				yy = 0;
+
+			print("x: " + touch.position.x.ToString() + ", y: " + touch.position.y.ToString() + ", currentPos: " + obj.transform.position.ToString());
+
+			obj.transform.Translate (new Vector3 (xx, yy, 0));
+			lastTouchedPos = new Vector2 (Input.GetTouch (0).position.x, Input.GetTouch (0).position.y);
 		}
-
-
 
 		/* Scalaing Gesture */
 		if (Input.touchCount == 2 && Input.GetTouch (0).phase == TouchPhase.Began) 
@@ -64,7 +93,10 @@ public class ObjectController : MonoBehaviour {
 				RaycastHit hit = hits [i];
 				if (hit.collider.gameObject.CompareTag ("Picture")) {
 					print ("User Tap Object: " + hit.collider.gameObject.name);
+					StopAllGiftRotate ();
 					obj = hit.collider.gameObject;
+					GalleryController objScript = obj.GetComponent<GalleryController>();
+					objScript.StartRotate();
 					break;
 				}
 			}
@@ -90,48 +122,72 @@ public class ObjectController : MonoBehaviour {
 			fingerDist = scaleDist;
 		}
 
-		if (obj && Input.touchCount <= 2 && Input.GetTouch (0).phase == TouchPhase.Ended) {
+		if (obj && Input.touchCount <= 2 &&  Input.touchCount > 0 && Input.GetTouch (0).phase == TouchPhase.Ended) {
 			obj = null;
 		}
 
-		if (Input.touchCount == 1 && Input.GetTouch (0).phase == TouchPhase.Began) 
+#if UNITY_EDITOR
+		// Below input event is only used for testing 
+		if (Input.GetMouseButtonDown(0)) 
 		{
-			Ray ray = Camera.main.ScreenPointToRay( Input.GetTouch(0).position );
+			Ray ray = Camera.main.ScreenPointToRay( Input.mousePosition );
 			RaycastHit[] hits;
 			hits = Physics.RaycastAll (ray);
+
+			lastTouchedPos = new Vector2 (Input.mousePosition.x, Input.mousePosition.y);
 
 			for (int i = 0; i < hits.Length; ++i) {
 				RaycastHit hit = hits [i];
 				if (hit.collider.gameObject.CompareTag ("gift")) {
+					StopAllGiftRotate();
 					GiftController exploScript = hit.collider.gameObject.GetComponent<GiftController> ();
 					exploScript.explosion ();
+					exploScript.StartRotate();
 					break;
 				}
 
-				if (hit.collider.gameObject.CompareTag("Picture"))
+				if (hit.collider.gameObject.CompareTag ("Picture")) {
+					StopAllGiftRotate();
+					print ("User Tap Object: " + hit.collider.gameObject.name);
+					obj = hit.collider.gameObject;
+					GalleryController objScript = obj.GetComponent<GalleryController>();
+					objScript.StartRotate();
 					break;
+				}
 			}
 		}
+
+		if (obj && Input.GetMouseButton(0)) {
+			Vector3 touchPos = Input.mousePosition;
+
+			float xx = 0.005f, yy = 0.005f;
+			if (touchPos.x - lastTouchedPos.x > 0)
+				xx = xx * -1f;
+			else if (touchPos.x - lastTouchedPos.x == 0)
+				xx = 0;
+
+			if (touchPos.y - lastTouchedPos.y < 0)
+				yy = yy * -1f;
+			else if (touchPos.y - lastTouchedPos.y == 0)
+				yy = 0;
+
+			print("x: " + touchPos.x.ToString() + ", y: " + touchPos.y.ToString() + ", currentPos: " + obj.transform.position.ToString());
+
+			obj.transform.Translate (new Vector3 (xx, yy, 0));
+			lastTouchedPos = new Vector2 (touchPos.x, touchPos.y);
+		}
+
+		if (obj && Input.GetMouseButtonUp (0)) {
+			obj = null;
+		}
+#endif
 	}
 
-	IEnumerator getJSON(string url) {
+	IEnumerator getJSON(string url, Text status) {
 		print ("getJSON!!");
 		WWW www = new WWW(url);
 		yield return www;
-		CodeInfo code = CodeInfo.CreateFromJSON (www.text);
-		for (int i = 0; i < code.assets.Length; ++i) {
-			GameObject clonedPic = Instantiate (pictureObj, new Vector3(1000, 1000, 1000), Quaternion.identity);
-			clonedPic.transform.localScale = pictureObj.transform.localScale * 0.1f;
-			clonedPic.tag = "Picture";
-			clonedPic.transform.parent = parObj.transform;
-
-			GalleryController galleryScript = clonedPic.GetComponent<GalleryController> ();
-			galleryScript.createObject (code.assets[i].type, code.assets[i].url);
-
-			print (code.assets[i].type + " " + code.assets [i].url);
-		}
-
-        
+		detectGift(www.text, status);
 	}
 
 	public void detectGift(string jsonString, Text status) {
@@ -141,13 +197,28 @@ public class ObjectController : MonoBehaviour {
 			status.text = "Match Postcard Fail ... ";
 			return;
 		}
-			
+
 		plane.GetComponent<StaticMapService>().LoadMap(code.latitude, code.longitude);
+
 		GameObject[] pictures = GameObject.FindGameObjectsWithTag ("Picture");
 		for (int i = 0; i < pictures.Length; ++i) 
 			Destroy (pictures [i]);
 
+		GameObject[] gifts = GameObject.FindGameObjectsWithTag ("gift");
+		for (int i = 0; i < gifts.Length; ++i)
+			Destroy (gifts [i]);
+
+		Renderer render = floorObj.GetComponent<Renderer> ();
+		float sizeX = render.bounds.size.x * 8f ;
+		float sizeZ = render.bounds.size.z * 8f ;
+
+		print ("SizeX: " + sizeX.ToString ());
+		print ("SizeZ: " + sizeZ.ToString ());
+
 		for (int i = 0; i < code.assets.Length; ++i) {
+			if (code.assets [i].type == "audio")
+				continue;
+
 			GameObject clonedPic = Instantiate (pictureObj, new Vector3(1000, 1000, 1000), Quaternion.identity);
 			clonedPic.transform.localScale = pictureObj.transform.localScale * 0.1f;
 			clonedPic.tag = "Picture";
@@ -155,6 +226,16 @@ public class ObjectController : MonoBehaviour {
 
 			GalleryController galleryScript = clonedPic.GetComponent<GalleryController> ();
 			galleryScript.createObject (code.assets[i].type, code.assets[i].url);
+
+			Vector3 newPos = floorObj.transform.TransformPoint(new Vector3(Random.Range (-sizeX, sizeX), 0, Random.Range (-sizeZ, sizeZ)));
+			print (newPos.ToString ());
+
+			GameObject clonedGift = Instantiate (giftObj, newPos + new Vector3(0, 0.1f, 0), Quaternion.identity);
+			clonedGift.GetComponent<GiftController> ().setPictureObj(clonedPic);
+			clonedGift.transform.parent = parObj.transform;
+			clonedGift.transform.localScale = new Vector3 (200f, 200f, 200f);
+			clonedGift.SetActive (true);
+			galleryScript.SetGift (clonedGift);
 
 			print (code.assets[i].type + " " + code.assets [i].url);
 		}
@@ -169,19 +250,12 @@ public class ObjectController : MonoBehaviour {
 		setMessage (code.text);
 	}
 
-	public void createGift(UnityEngine.UI.Text inputCode) {
-		/* http://35.196.236.27:3000/postcard/code/V4GW63 */
+	public void CreateGiftFromCode() {
 		string code = inputCode.text;
+		code = "3XQWX1";
 		string url = "http://35.196.236.27:3000/postcard/code/" + code;
 		print (url);
-
-		GameObject[] pictures = GameObject.FindGameObjectsWithTag ("Picture");
-		for (int i = 0; i < pictures.Length; ++i) {
-			Destroy (pictures [i]);
-		}
-
-		StartCoroutine (getJSON(url));
-		giftObj.SetActive (true);
+		StartCoroutine (getJSON(url, status));
 	}
 
 	public void toggleMessage() {
@@ -192,7 +266,15 @@ public class ObjectController : MonoBehaviour {
 		Vector3 pos = Camera.main.transform.position;
 		print (pos);
 		TextMeshPro textmeshPro = messageObj.GetComponent<TextMeshPro> ();
-		textmeshPro.SetText (text);
+		//textmeshPro.SetText (text);
+	}
+
+	private void StopAllGiftRotate() {
+		GameObject[] pins = GameObject.FindGameObjectsWithTag ("gift");
+		for (int i = 0; i < pins.Length; ++i) {
+			GiftController gc = pins [i].GetComponent<GiftController> ();
+			gc.StopRotate ();
+		}
 	}
 
 }
