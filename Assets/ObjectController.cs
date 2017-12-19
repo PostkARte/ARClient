@@ -22,7 +22,7 @@ public class ObjectController : MonoBehaviour {
 	private float fingerDist;
 	private string data;
 	private Transform floorPos;
-	private Vector2 lastTouchedPos; 
+	private Vector3 lastTouchedPos; 
 
 	// Use this for initialization
 	void Start () {
@@ -62,25 +62,16 @@ public class ObjectController : MonoBehaviour {
 			}
 		}
 
-		if (obj && Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) {
-			Touch touch = Input.GetTouch(0); // get first touch since touch count is greater than zero
-			// get the touch position from the screen touch to world point
+		if (obj && Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) 
+		{
+			Vector3 touchPos = Input.mousePosition;
+			Vector3 touchVector = touchPos - lastTouchedPos;
+			lastTouchedPos = touchPos;
 
-			float xx = 0.005f, yy = 0.005f;
-			if (touch.position.x - lastTouchedPos.x > 0)
-				xx = xx * -1f;
-			else if (touch.position.x - lastTouchedPos.x == 0)
-				xx = 0;
+			float xx = -touchVector.x;
+			float yy = touchVector.y;
 
-			if (touch.position.y - lastTouchedPos.y < 0)
-				yy = yy * -1f;
-			else if (touch.position.y - lastTouchedPos.y == 0)
-				yy = 0;
-
-			print("x: " + touch.position.x.ToString() + ", y: " + touch.position.y.ToString() + ", currentPos: " + obj.transform.position.ToString());
-
-			obj.transform.Translate (new Vector3 (xx, yy, 0));
-			lastTouchedPos = new Vector2 (Input.GetTouch (0).position.x, Input.GetTouch (0).position.y);
+			obj.transform.Translate (new Vector3 (xx / 1920f / 5f, yy / 1080f / 5f, 0));
 		}
 
 		/* Scalaing Gesture */
@@ -134,7 +125,7 @@ public class ObjectController : MonoBehaviour {
 			RaycastHit[] hits;
 			hits = Physics.RaycastAll (ray);
 
-			lastTouchedPos = new Vector2 (Input.mousePosition.x, Input.mousePosition.y);
+			lastTouchedPos = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, 0);
 
 			for (int i = 0; i < hits.Length; ++i) {
 				RaycastHit hit = hits [i];
@@ -159,22 +150,15 @@ public class ObjectController : MonoBehaviour {
 
 		if (obj && Input.GetMouseButton(0)) {
 			Vector3 touchPos = Input.mousePosition;
+			Vector3 touchVector = touchPos - lastTouchedPos;
+			lastTouchedPos = touchPos;
+	
+			float xx = -touchVector.x;
+			float yy = touchVector.y;
+	
+			print(touchVector.ToString());
 
-			float xx = 0.005f, yy = 0.005f;
-			if (touchPos.x - lastTouchedPos.x > 0)
-				xx = xx * -1f;
-			else if (touchPos.x - lastTouchedPos.x == 0)
-				xx = 0;
-
-			if (touchPos.y - lastTouchedPos.y < 0)
-				yy = yy * -1f;
-			else if (touchPos.y - lastTouchedPos.y == 0)
-				yy = 0;
-
-			print("x: " + touchPos.x.ToString() + ", y: " + touchPos.y.ToString() + ", currentPos: " + obj.transform.position.ToString());
-
-			obj.transform.Translate (new Vector3 (xx, yy, 0));
-			lastTouchedPos = new Vector2 (touchPos.x, touchPos.y);
+			obj.transform.Translate (new Vector3 (xx / 1920f / 5f, yy / 1080f / 5f, 0));
 		}
 
 		if (obj && Input.GetMouseButtonUp (0)) {
@@ -227,7 +211,18 @@ public class ObjectController : MonoBehaviour {
 			GalleryController galleryScript = clonedPic.GetComponent<GalleryController> ();
 			galleryScript.createObject (code.assets[i].type, code.assets[i].url);
 
-			Vector3 newPos = floorObj.transform.TransformPoint(new Vector3(Random.Range (-sizeX, sizeX), 0, Random.Range (-sizeZ, sizeZ)));
+			Vector3 newPos;
+			GameObject[] existedGifts = GameObject.FindGameObjectsWithTag ("gift");
+			do {
+				newPos = floorObj.transform.TransformPoint(
+					new Vector3(
+						Random.Range (-sizeX, sizeX), 
+						0, 
+						Random.Range (-sizeZ, sizeZ)
+					)
+				);
+			} while(!DistanceOverThreshold(existedGifts, newPos));
+
 			print (newPos.ToString ());
 
 			GameObject clonedGift = Instantiate (giftObj, newPos + new Vector3(0, 0.1f, 0), Quaternion.identity);
@@ -260,6 +255,19 @@ public class ObjectController : MonoBehaviour {
 
 	public void toggleMessage() {
 		messageObj.SetActive (!messageObj.activeSelf);
+	}
+
+	private bool DistanceOverThreshold(GameObject[] existedGifts, Vector3 newPos)
+	{
+		const float THRESHOLD = 0.1f;
+		bool overThreshold = true;
+
+		for (int i = 0; i < existedGifts.Length; ++i) {
+			Vector3 spawnedObjPos = existedGifts [i].transform.position;
+			overThreshold &= (Vector3.Distance (spawnedObjPos, newPos) > THRESHOLD);
+		}
+
+		return overThreshold;
 	}
 
 	private void setMessage(string text) {
