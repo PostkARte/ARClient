@@ -247,7 +247,9 @@ public class ObjectController : MonoBehaviour {
 
 	public void CreateGiftFromCode() {
 		string code = inputCode.text;
-		code = "3XQWX1";
+		if (code.Length == 0)
+			code = "3XQWX1";
+
 		string url = "http://35.196.236.27:3000/postcard/code/" + code;
 		print (url);
 		StartCoroutine (getJSON(url, status));
