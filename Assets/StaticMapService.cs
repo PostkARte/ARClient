@@ -10,7 +10,7 @@ public class StaticMapService : MonoBehaviour {
     private int zoom = 14;
 
     private string mapSelected = "hybrid";
-    private int scale = 2;
+    private int scale = 3;
 
     // Use this for initialization
     public void LoadMap (float lat, float lon) {
@@ -31,8 +31,8 @@ public class StaticMapService : MonoBehaviour {
         Debug.Log(z);
 
         string url = "https://maps.googleapis.com/maps/api/staticmap?center=" + lat + "," + lon +
-            "&zoom=" + zoom + "&size=" + x + "x" + z + "&scale=" + scale
-            + "&maptype=" + mapSelected +
+            "&zoom=" + zoom + "&size=" + "2048" + "x" + "2048" + "&scale=" + scale
+            + /*"&maptype=" + mapSelected +*/
             "&key=AIzaSyDjWFpSKVXK2tXoeafA3YI1gsW9u-vV9X8";
         WWW www = new WWW(url);
         yield return www;
