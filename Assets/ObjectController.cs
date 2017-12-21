@@ -166,8 +166,8 @@ public class ObjectController : MonoBehaviour {
 			obj = null;
 		}
 #endif
-		BrakeObject (messageObj);
-		BrakeObject (videoObj);
+		UpdateObjectPosition (messageObj);
+		// UpdateObjectPosition (videoObj);
 
 	}
 
@@ -290,23 +290,28 @@ public class ObjectController : MonoBehaviour {
 	private void setMessage(string text) {
 		TextMeshPro textmeshPro = messageObj.GetComponent<TextMeshPro> ();
 		textmeshPro.SetText (text);
-		messageObj.transform.position = new Vector3 (0, 0, 0);
+		messageObj.SetActive (false);
 	}
 
 	private void ToggleObject(GameObject obj) {
 		if (obj != null) {
 			obj.SetActive (!obj.activeSelf);
 			if (obj.activeSelf) {
-				obj.GetComponent<Rigidbody> ().AddForce (new Vector3 (0, 0, 50f));
-			} else {
-				obj.transform.position = new Vector3 (0, 0, 0);
+				obj.transform.position = Camera.main.gameObject.transform.position + Camera.main.transform.forward * 0.2f;
 			}
 		}
 	}
 
-	private void BrakeObject(GameObject obj) {
-		if (obj != null && obj.transform.position.z >= 1) {
-			obj.GetComponent<Rigidbody> ().velocity = new Vector3 (0, 0, 0);
+	private void UpdateObjectPosition(GameObject obj) {
+		if (obj != null) {
+			/* Always look at the camera */
+			obj.transform.LookAt (
+				new Vector3(
+					Camera.main.transform.position.x, 
+					obj.transform.position.y, 
+					Camera.main.transform.position.z
+				)
+			);
 		}
 	}
 
