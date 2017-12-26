@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Video;
 using TMPro;
 
 public class ObjectController : MonoBehaviour {
@@ -24,11 +25,13 @@ public class ObjectController : MonoBehaviour {
 	private string data;
 	private Transform floorPos;
 	private Vector3 lastTouchedPos; 
+	private bool isToggled;
 
 	// Use this for initialization
 	void Start () {
+		isToggled = false;
 		giftObj.SetActive (false);
-		messageObj.SetActive (false);
+		// messageObj.SetActive (false);
 		floorPos = floorObj.GetComponent<Transform> ();
 	}
 	
@@ -166,7 +169,7 @@ public class ObjectController : MonoBehaviour {
 			obj = null;
 		}
 #endif
-		UpdateObjectPosition (messageObj);
+		// UpdateObjectPosition (messageObj);
 		// UpdateObjectPosition (videoObj);
 
 	}
@@ -218,7 +221,9 @@ public class ObjectController : MonoBehaviour {
 
 			if (type == "video") {
 				videoObj = clonedPic;
-				ToggleObject (clonedPic);
+				videoObj.SetActive (true);
+				videoObj.tag = "Untagged";
+				continue;
 			}
 
 			Vector3 newPos;
@@ -259,7 +264,7 @@ public class ObjectController : MonoBehaviour {
 	public void CreateGiftFromCode() {
 		string code = inputCode.text;
 		if (code.Length == 0)
-			code = "3XQWX1";
+			code = "9XNR4K";
 
 		string url = "http://35.196.236.27:3000/postcard/code/" + code;
 		print (url);
@@ -288,17 +293,33 @@ public class ObjectController : MonoBehaviour {
 	}
 
 	private void setMessage(string text) {
-		TextMeshPro textmeshPro = messageObj.GetComponent<TextMeshPro> ();
+		GameObject textMeshObj = messageObj.transform.GetChild (0).GetChild(0).gameObject;
+		TextMeshPro textmeshPro = textMeshObj.GetComponent<TextMeshPro> ();
 		textmeshPro.SetText (text);
-		messageObj.SetActive (false);
+		messageObj.SetActive (true);
+		messageObj.transform.position = new Vector3 (1000, 1000, 1000);
 	}
 
 	private void ToggleObject(GameObject obj) {
 		if (obj != null) {
-			obj.SetActive (!obj.activeSelf);
-			if (obj.activeSelf) {
-				obj.transform.position = Camera.main.gameObject.transform.position + Camera.main.transform.forward * 0.2f;
+			GalleryController sc = obj.GetComponent<GalleryController> ();
+			VideoPlayer vp = obj.transform.GetChild (0).GetChild (0).GetComponent<VideoPlayer> ();
+
+			if (!sc.isToggled) {
+				obj.transform.localScale = Vector3.zero;
+				obj.transform.position = Camera.main.gameObject.transform.position + Camera.main.transform.forward * 0.2f;	
+				sc.SetTargetScale (new Vector3 (1.2f, 1.2f, 1.2f));
+
+				if (vp) 
+					vp.Play ();
+				
+			} else {
+				sc.SetTargetScale (new Vector3 (0, 0, 0));
+				if (vp)
+					vp.Stop ();
 			}
+
+			sc.isToggled = !sc.isToggled;
 		}
 	}
 

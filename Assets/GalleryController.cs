@@ -6,6 +6,7 @@ using UnityEngine.Video;
 public class GalleryController : MonoBehaviour {
 
 	public Transform center;
+	public bool isToggled;
 
 	private Vector3 goal;
 	private Vector3 targetScale;
@@ -13,11 +14,13 @@ public class GalleryController : MonoBehaviour {
 	private GameObject childObj;
 	private GameObject giftObj;
 
+
 	void Start() {
 		childObj = gameObject.transform.GetChild (0).GetChild(0).gameObject;
 		goal = Vector3.zero;
 		targetScale = gameObject.transform.localScale;
 		center = gameObject.transform;
+		isToggled = false;
 	}
 
 	// Update is called once per frame
@@ -76,9 +79,13 @@ public class GalleryController : MonoBehaviour {
 
 	}
 
+	public void SetTargetScale(Vector3 scale) {
+		targetScale = scale;
+	}
+
 	public void createObject(string type, string url) {
 		if (type == "video") {
-			StartCoroutine (createVideo (url));
+			createVideo (url);
 		} else if (type == "image") {
 			StartCoroutine (createImage (url));
 		} else if (type == "audio") {
@@ -97,8 +104,8 @@ public class GalleryController : MonoBehaviour {
 		renderer.material.mainTexture = www.texture;
 	}
 
-	IEnumerator createVideo(string url) {
-		
+	void createVideo(string url) {
+		childObj = gameObject.transform.GetChild (0).GetChild(0).gameObject;
 		childObj.AddComponent<VideoPlayer> ();
 		VideoPlayer player = childObj.GetComponent<VideoPlayer> ();
 		player.url = url;
@@ -106,7 +113,6 @@ public class GalleryController : MonoBehaviour {
 		player.isLooping = true;
 		player.source = VideoSource.Url;
 		player.Stop ();
-		yield return null;
 	}
 
 	IEnumerator createAudio(string url) {
