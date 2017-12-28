@@ -347,6 +347,14 @@ public class ObjectController : MonoBehaviour {
 		ToggleObject (videoObj);
 	}
 
+	public void ExplosionAll() {
+		GameObject[] gifts = GameObject.FindGameObjectsWithTag ("gift");
+		for (int i = 0; i < gifts.Length; ++i) {
+			GiftController script = gifts [i].GetComponent<GiftController> ();
+			script.explosion ();
+		}
+	}
+
 	private bool DistanceOverThreshold(GameObject[] existedGifts, Vector3 newPos)
 	{
 		const float THRESHOLD = 0.1f;
