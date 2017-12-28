@@ -20,7 +20,6 @@ namespace UnityEngine.XR.iOS
 					Vector3 lookPos = new Vector3 (cameraTransform.position.x, m_HitTransform.position.y, cameraTransform.position.z);
 					m_HitTransform.LookAt (lookPos);
 
-
                     Debug.Log (string.Format ("x:{0:0.######} y:{1:0.######} z:{2:0.######}", m_HitTransform.position.x, m_HitTransform.position.y, m_HitTransform.position.z));
                     return true;
                 }
@@ -37,6 +36,7 @@ namespace UnityEngine.XR.iOS
 				if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved)
 				{
 					var screenPosition = Camera.main.ScreenToViewportPoint(touch.position);
+
 					ARPoint point = new ARPoint {
 						x = screenPosition.x,
 						y = screenPosition.y
@@ -62,7 +62,31 @@ namespace UnityEngine.XR.iOS
 			}
 		}
 
-	
+		public void ShowHitCube() 
+		{
+			var screenPosition = Camera.main.ScreenToViewportPoint(new Vector2(960f, 540f));
+			ARPoint point = new ARPoint {
+				x = screenPosition.x,
+				y = screenPosition.y
+			};
+					
+			// prioritize reults types
+			ARHitTestResultType[] resultTypes = {
+				ARHitTestResultType.ARHitTestResultTypeExistingPlaneUsingExtent, 
+				// if you want to use infinite planes use this:
+				//ARHitTestResultType.ARHitTestResultTypeExistingPlane,
+				ARHitTestResultType.ARHitTestResultTypeHorizontalPlane, 
+				ARHitTestResultType.ARHitTestResultTypeFeaturePoint
+			}; 
+
+			foreach (ARHitTestResultType resultType in resultTypes)
+			{
+				if (HitTestWithResultType (point, resultType))
+				{
+					return;
+				}
+			}
+		}
 	}
 }
 

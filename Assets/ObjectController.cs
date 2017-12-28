@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using UnityEngine.XR.iOS;
 using TMPro;
 
 public class ObjectController : MonoBehaviour {
@@ -16,6 +17,7 @@ public class ObjectController : MonoBehaviour {
 	public GameObject floorObj;
 	public Text inputCode;
 	public Text status;
+	public UnityARHitTestExample arCtlScript;
 
 	private Transform toDrag;
 	private float dist;
@@ -237,6 +239,7 @@ public class ObjectController : MonoBehaviour {
 			clonedPic.transform.localScale = pictureObj.transform.localScale * 0.1f;
 			clonedPic.tag = "Picture";
 			clonedPic.transform.parent = parObj.transform;
+			clonedPic.name = clonedPic.name + "_" + i.ToString ();
 
 			GalleryController galleryScript = clonedPic.GetComponent<GalleryController> ();
 			galleryScript.createObject (type, code.assets[i].url);
@@ -250,6 +253,7 @@ public class ObjectController : MonoBehaviour {
 
 			Vector3 newPos;
 			GameObject[] existedGifts = GameObject.FindGameObjectsWithTag ("gift");
+		/*
 			do {
 				newPos = floorObj.transform.TransformPoint(
 					new Vector3(
@@ -259,6 +263,41 @@ public class ObjectController : MonoBehaviour {
 					)
 				);
 			} while(!DistanceOverThreshold(existedGifts, newPos));
+*/
+			float fakeX = 0, fakeZ = 0;
+			float origX = 0.6f;
+			float origZ = -1.3f;
+
+			switch (i) {
+			case 0:
+				fakeX = -0.19f;
+				fakeZ = -1.72f;
+				break;
+			
+			case 1:
+				fakeX = 0.332f;
+				fakeZ = 0.734f;
+				break;
+			
+			case 2:
+				fakeX = 0.9f;
+				fakeZ = -4.13f;
+				break;
+			
+			case 3:
+				fakeX = -0.03f;
+				fakeZ = 4.18f;
+				break;
+			
+			case 4:
+				fakeX = -0.737f;
+				fakeZ = 1.789f;
+				break;	
+			}
+
+			newPos = floorObj.transform.TransformPoint(
+				new Vector3(fakeX, 0, fakeZ)
+			);
 
 			print (newPos.ToString ());
 
@@ -267,6 +306,7 @@ public class ObjectController : MonoBehaviour {
 			clonedGift.transform.parent = parObj.transform;
 			clonedGift.transform.localScale = new Vector3 (200f, 200f, 200f);
 			clonedGift.SetActive (true);
+			clonedGift.name = clonedGift.name + "_" + i.ToString ();
 			galleryScript.SetGift (clonedGift);
 
 			print (code.assets[i].type + " " + code.assets [i].url);
@@ -274,19 +314,25 @@ public class ObjectController : MonoBehaviour {
 
 		if (code.assets.Length == 0)
 			status.text = "There is no pictures in postcard ..";
-		else
+		else {
+
 			status.text = "Match postcard successfully !";
-		
+#if !UNITY_EDITOR
+			print ("Try to hit ... ");
+			arCtlScript.ShowHitCube ();
+			print ("Has hit cube ...");
+#endif
+		}
+
 		giftObj.SetActive (true);
 
 		setMessage (code.text);
 	}
-
-		/* http://35.196.236.27:3000/postcard/code/V4GW63 */
+		
 	public void CreateGiftFromCode() {
 		string code = inputCode.text;
 		if (code.Length == 0)
-			code = "9XNR4K";
+			code = "3XQWX1";
 
 		string url = "http://35.196.236.27:3000/postcard/code/" + code;
 		print (url);
@@ -367,6 +413,7 @@ public class ObjectController : MonoBehaviour {
 	}
 
 }
+
 
 [System.Serializable]
 public class AssetInfo
