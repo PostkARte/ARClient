@@ -63,6 +63,17 @@ public class ObjectController : MonoBehaviour {
 					objScript.StartRotate();
 					break;
 				}
+
+				if (hit.collider.gameObject.CompareTag ("Video")) {
+					VideoPlayer vp = hit.collider.gameObject.transform.
+						GetChild(0).GetChild(0).gameObject.
+						GetComponent<VideoPlayer>();
+					if (vp.isPlaying)
+						vp.Pause();
+					else
+						vp.Play();
+					break;
+				}
 			}
 		}
 
@@ -149,6 +160,17 @@ public class ObjectController : MonoBehaviour {
 					objScript.StartRotate();
 					break;
 				}
+
+				if (hit.collider.gameObject.CompareTag ("Video")) {
+					VideoPlayer vp = hit.collider.gameObject.transform.
+										GetChild(0).GetChild(0).gameObject.
+										GetComponent<VideoPlayer>();
+					if (vp.isPlaying)
+						vp.Pause();
+					else
+						vp.Play();
+					break;
+				}
 			}
 		}
 			
@@ -222,7 +244,7 @@ public class ObjectController : MonoBehaviour {
 			if (type == "video") {
 				videoObj = clonedPic;
 				videoObj.SetActive (true);
-				videoObj.tag = "Untagged";
+				videoObj.tag = "Video";
 				continue;
 			}
 
