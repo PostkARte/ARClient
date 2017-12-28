@@ -9,6 +9,7 @@ public class MainController : MonoBehaviour {
 	public GameObject ReceiverScreen;
 	public GameObject IconMenu;
 	public GameObject Header;
+	public GameObject Sphere;
 
 	private GameObject menu;
 
@@ -44,6 +45,10 @@ public class MainController : MonoBehaviour {
 		OnboardScreen.SetActive (false);
 		MainScreen.SetActive (false);
 		ReceiverScreen.SetActive (true);
+	}
+
+	public void Toggle360 () {
+		Sphere.SetActive (!Sphere.activeSelf);
 	}
 
 	public void OnSenderClick () {
