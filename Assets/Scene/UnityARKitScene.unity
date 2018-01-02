@@ -1128,6 +1128,7 @@ MonoBehaviour:
   floorObj: {fileID: 1215883948}
   inputCode: {fileID: 458686860}
   status: {fileID: 1066674554}
+  arCtlScript: {fileID: 985681519}
 --- !u!1 &294771741
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
 using TMPro;
+using UnityEngine.XR.iOS;
 
 public class ObjectController : MonoBehaviour {
 
@@ -16,6 +17,7 @@ public class ObjectController : MonoBehaviour {
 	public GameObject floorObj;
 	public Text inputCode;
 	public Text status;
+	public UnityARHitTestExample arCtlScript;
 
 	private Transform toDrag;
 	private float dist;
@@ -274,9 +276,13 @@ public class ObjectController : MonoBehaviour {
 
 		if (code.assets.Length == 0)
 			status.text = "There is no pictures in postcard ..";
-		else
+		else {
+			#if !UNITY_EDITOR
+				arCtlScript.ToggleShowMap ();
+			#endif
 			status.text = "Match postcard successfully !";
-		
+		}
+
 		giftObj.SetActive (true);
 
 		setMessage (code.text);

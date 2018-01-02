@@ -63,6 +63,31 @@ namespace UnityEngine.XR.iOS
 		}
 
 	
+		public void ToggleShowMap() {
+			var screenPosition = Camera.main.ScreenToViewportPoint(new Vector2(1920/2, 1080/2));
+			ARPoint point = new ARPoint {
+				x = screenPosition.x,
+				y = screenPosition.y
+			};
+
+			// prioritize reults types
+			ARHitTestResultType[] resultTypes = {
+				ARHitTestResultType.ARHitTestResultTypeExistingPlaneUsingExtent, 
+				// if you want to use infinite planes use this:
+				//ARHitTestResultType.ARHitTestResultTypeExistingPlane,
+				ARHitTestResultType.ARHitTestResultTypeHorizontalPlane, 
+				ARHitTestResultType.ARHitTestResultTypeFeaturePoint
+			}; 
+
+			foreach (ARHitTestResultType resultType in resultTypes)
+			{
+				if (HitTestWithResultType (point, resultType))
+				{
+					return;
+				}
+			}
+		}
+	
 	}
 }
 
